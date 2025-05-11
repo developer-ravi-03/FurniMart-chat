@@ -1,9 +1,19 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import RegisterPage from "./components/Register";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
 
 function App() {
   return (
     <>
-      <div className="mt-5 p-7">Its me</div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
