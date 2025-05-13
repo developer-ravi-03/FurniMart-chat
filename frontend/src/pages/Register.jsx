@@ -455,7 +455,7 @@ export default function RegisterPage() {
 
             {/* Role Selection */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 flex items-center">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
                 <Users size={18} className="mr-1" />
                 Account Type
               </label>
