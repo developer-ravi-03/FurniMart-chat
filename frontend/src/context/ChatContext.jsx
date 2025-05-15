@@ -4,8 +4,6 @@ import { UserData } from "./UserContext";
 
 // Create context
 const ChatContext = createContext(null);
-
-// Custom hook for consuming context
 export const useChatContext = () => useContext(ChatContext);
 
 export const ChatProvider = ({ children }) => {
@@ -17,8 +15,6 @@ export const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // ...existing code...
 
   // Fetch active chats (for support/admin)
   const fetchActiveChats = async () => {
@@ -84,6 +80,7 @@ export const ChatProvider = ({ children }) => {
   };
 
   // Send message
+  //this is not in routes section so it dont work
   const sendMessage = async (content) => {
     if (!currentChat || !content.trim()) return;
     try {
@@ -97,60 +94,6 @@ export const ChatProvider = ({ children }) => {
       return res.data;
     } catch (err) {
       setError("Failed to send message");
-      console.error(err);
-      return null;
-    }
-  };
-
-  // Assign chat
-  const assignChat = async (chatId, userId) => {
-    if (!user || (user.role !== "support" && user.role !== "admin")) return;
-    try {
-      const res = await axios.put(`/api/chat/assign/${chatId}`, { userId });
-      setActiveChats((prev) =>
-        prev.map((chat) =>
-          chat.chatId === chatId
-            ? { ...chat, assignedTo: res.data.assignedTo }
-            : chat
-        )
-      );
-      return res.data;
-    } catch (err) {
-      setError("Failed to assign chat");
-      console.error(err);
-      return null;
-    }
-  };
-
-  // Resolve chat
-  const resolveChat = async (chatId) => {
-    try {
-      const res = await axios.put(`/api/chat/resolve/${chatId}`);
-      setActiveChats((prev) => prev.filter((chat) => chat.chatId !== chatId));
-      setChatHistory((prev) =>
-        prev.map((chat) =>
-          chat.chatId === chatId ? { ...chat, status: "resolved" } : chat
-        )
-      );
-      return res.data;
-    } catch (err) {
-      setError("Failed to resolve chat");
-      console.error(err);
-      return null;
-    }
-  };
-
-  // Mark message as read
-  const markAsRead = async (messageId) => {
-    try {
-      const res = await axios.put(`/api/chat/read/${messageId}`);
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg._id === messageId ? { ...msg, status: "read" } : msg
-        )
-      );
-      return res.data;
-    } catch (err) {
       console.error(err);
       return null;
     }
@@ -173,9 +116,6 @@ export const ChatProvider = ({ children }) => {
     loadChatMessages,
     createNewChat,
     sendMessage,
-    assignChat,
-    resolveChat,
-    markAsRead,
     clearError,
   };
 

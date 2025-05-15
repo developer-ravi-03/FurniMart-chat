@@ -10,7 +10,8 @@ export const UserProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [error, setError] = useState(null);
 
-  // Always set token in axios headers if present in localStorage
+  // Check for token and user data in localStorage on initial load
+  // Set axios default headers for token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -38,8 +39,7 @@ export const UserProvider = ({ children }) => {
     }
   }, [error]);
 
-  // REGISTER user with improved error handling
-  // Updated register function that aligns with the User model and register route
+  // REGISTER user
   const register = async ({
     name,
     email,
@@ -65,7 +65,7 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userData));
 
       // Set token for axios after registration
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common["x-auth-token"] = token;
 
       toast.success("Registration successful!");
       navigate("/login");
@@ -88,6 +88,7 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // LOGIN user
   const login = async ({ email, password }, navigate) => {
     try {
       setLoading(true);
@@ -104,7 +105,7 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("token", token);
 
       // Set token for axios after login
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common["x-auth-token"] = token;
 
       toast.success("Login successful!");
       navigate("/");
@@ -120,30 +121,24 @@ export const UserProvider = ({ children }) => {
 
   // Extract meaningful error messages from various error response formats
   const extractErrorMessage = (err) => {
-    // Check for axios error response formats
     if (err.response) {
-      // Direct error message from API
       if (err.response.data && err.response.data.message) {
         return err.response.data.message;
       }
 
-      // Error object with multiple field errors
       if (err.response.data && err.response.data.errors) {
         const errorsObj = err.response.data.errors;
 
-        // Handle array of error objects
         if (Array.isArray(errorsObj)) {
           return errorsObj[0]?.message || "Unknown error occurred";
         }
 
-        // Handle object of field errors
         const firstError = Object.values(errorsObj)[0];
         if (firstError) {
           return Array.isArray(firstError) ? firstError[0] : firstError;
         }
       }
 
-      // Status-based fallback messages
       if (err.response.status === 401) {
         return "Invalid email or password";
       }
@@ -157,21 +152,22 @@ export const UserProvider = ({ children }) => {
       return `Error: ${err.response.status}`;
     }
 
-    // Network errors
     if (err.request && !err.response) {
       return "Network error. Please check your connection.";
     }
 
-    // Fallback for other error types
     return err.message || "An unexpected error occurred";
   };
 
   // LOGOUT user
-  const logout = () => {
+  const logout = (navigate) => {
     setUser(null);
     setIsAuth(false);
     localStorage.removeItem("user");
-    toast.info("Logged out");
+    localStorage.removeItem("token");
+    delete axios.defaults.headers.common["x-auth-token"];
+    toast.success("Logged out");
+    navigate("/login");
   };
 
   return (

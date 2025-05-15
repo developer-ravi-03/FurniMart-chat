@@ -11,11 +11,10 @@ import {
   Lock,
   Users,
 } from "lucide-react";
-import { UserContext } from "../context/UserContext"; // Adjust path as needed
+import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
-  // Get auth context functions
   const { register, isLoading, error, setError } = useContext(UserContext);
 
   // Form state
@@ -174,8 +173,6 @@ export default function RegisterPage() {
         password: "",
         confirmPassword: "",
       });
-
-      // Redirect will happen automatically if your context sets isAuth to true
     }
   };
 
