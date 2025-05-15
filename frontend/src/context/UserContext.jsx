@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -11,8 +10,12 @@ export const UserProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load user from localStorage on app load
+  // Always set token in axios headers if present in localStorage
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["x-auth-token"] = token;
+    }
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
@@ -20,7 +23,6 @@ export const UserProvider = ({ children }) => {
         setUser(parsedUser);
         setIsAuth(true);
       } catch (err) {
-        // Handle invalid JSON in localStorage
         localStorage.removeItem("user");
         console.error("Invalid user data in localStorage:", err);
       }
@@ -51,33 +53,25 @@ export const UserProvider = ({ children }) => {
         name,
         email,
         password,
-        role, // Include role from the User model enum
+        role,
       });
 
-      // Handle the response based on the actual API response structure
-      // Your register route returns { token, user: { id, name, email, role } }
       const token = res.data.token;
       const userData = res.data.user;
 
-      // Save token
       localStorage.setItem("token", token);
-
-      // Save user data
       setUser(userData);
       setIsAuth(true);
       localStorage.setItem("user", JSON.stringify(userData));
 
-      // Configure axios to use the token for future requests
+      // Set token for axios after registration
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       toast.success("Registration successful!");
       navigate("/login");
       return { success: true };
     } catch (err) {
-      // Enhanced error handling specific to registration errors
       const errorMessage = extractErrorMessage(err);
-
-      // Handle specific registration errors from the route
       if (
         err.response?.status === 400 &&
         err.response?.data?.msg === "User already exists"
@@ -87,7 +81,6 @@ export const UserProvider = ({ children }) => {
         toast.error(message);
         return { success: false, message };
       }
-
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {
@@ -95,7 +88,6 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // LOGIN user with improved error handling
   const login = async ({ email, password }, navigate) => {
     try {
       setLoading(true);
@@ -104,10 +96,16 @@ export const UserProvider = ({ children }) => {
         password,
       });
 
+      const token = res.data.token;
       const userData = res.data.user;
       setUser(userData);
       setIsAuth(true);
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", token);
+
+      // Set token for axios after login
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       toast.success("Login successful!");
       navigate("/");
       return { success: true };
