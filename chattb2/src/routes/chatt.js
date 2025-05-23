@@ -163,4 +163,43 @@ router.get("/history", auth.authenticate, async (req, res) => {
   }
 });
 
+// @route   POST api/chat/send
+// @desc    Send a new message in a chat
+// @access  Private
+router.post("/send", auth.authenticate, async (req, res) => {
+  try {
+    const { chatId, content, receiver } = req.body;
+
+    if (!chatId || !content || !receiver) {
+      return res.status(400).json({ msg: "Missing required fields" });
+    }
+
+    // console.log("req.user =", req.user); // Debug log
+
+    const sender = await User.findById(req.user); // Fixed from req.user to req.user.id
+
+    if (!sender) {
+      return res.status(404).json({ msg: "Sender not found" });
+    }
+
+    const message = new Message({
+      chatId,
+      sender: sender._id,
+      content,
+      receiver,
+    });
+
+    await message.save();
+
+    const populatedMessage = await Message.findById(message._id)
+      .populate("sender", "name email")
+      .populate("assignedTo", "name email");
+
+    res.json(populatedMessage);
+  } catch (err) {
+    console.error("🔥 Error in /api/chat/send:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
 module.exports = router;
