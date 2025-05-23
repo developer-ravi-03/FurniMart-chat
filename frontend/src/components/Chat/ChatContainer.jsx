@@ -52,12 +52,6 @@ const ChatContainer = ({ selectedUser }) => {
           <p className="text-gray-500 mb-6">
             Select a user from the sidebar to start or continue a conversation.
           </p>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-600">
-              Support tip: Remember to check user details before responding to
-              ensure personalized assistance.
-            </p>
-          </div>
         </div>
       </div>
     );
@@ -124,7 +118,7 @@ const ChatContainer = ({ selectedUser }) => {
       </div>
 
       {/* Message list */}
-      <div className="flex-1 overflow-hidden bg-gray-100">
+      <div className="flex-1 overflow-y-auto bg-gray-100">
         <MessageList messages={messages} user={user} />
       </div>
 

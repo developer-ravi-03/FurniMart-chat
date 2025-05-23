@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { CheckCheck, Clock } from "lucide-react";
+import { Check, CheckCheck, Clock } from "lucide-react";
 
 const MessageList = ({ messages, user }) => {
   const messagesEndRef = useRef(null);
@@ -13,7 +13,7 @@ const MessageList = ({ messages, user }) => {
     const groups = {};
 
     msgs.forEach((msg) => {
-      const date = new Date(msg.timestamp || Date.now());
+      const date = new Date(msg.createdAt || Date.now());
       const dateKey = date.toDateString();
 
       if (!groups[dateKey]) {
@@ -75,10 +75,21 @@ const MessageList = ({ messages, user }) => {
 
           {/* Messages for this date */}
           {groupedMessages[dateKey].map((msg, index) => {
-            const isUser = msg.sender === user._id;
+            // Safety checks for undefined values
+            const senderId = msg.sender?._id || msg.sender;
+            const userId = user?.id || user?._id || user;
+
+            const isUser =
+              senderId && userId && senderId.toString() === userId.toString();
+
+            const prevSenderId =
+              groupedMessages[dateKey][index - 1]?.sender?._id ||
+              groupedMessages[dateKey][index - 1]?.sender;
             const isConsecutive =
               index > 0 &&
-              groupedMessages[dateKey][index - 1].sender === msg.sender;
+              prevSenderId &&
+              senderId &&
+              prevSenderId.toString() === senderId.toString();
 
             return (
               <div
@@ -99,7 +110,7 @@ const MessageList = ({ messages, user }) => {
                       ${
                         isUser
                           ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-none"
-                          : "bg-white text-gray-800 rounded-bl-none border border-gray-200"
+                          : "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 rounded-bl-none border border-gray-300"
                       }
                       ${isConsecutive ? "" : ""}
                     `}
@@ -110,17 +121,19 @@ const MessageList = ({ messages, user }) => {
                     <div
                       className={`
                         text-xs mt-1 flex items-center justify-end space-x-1
-                        ${isUser ? "text-blue-100" : "text-gray-400"}
+                        ${isUser ? "text-blue-100" : "text-gray-500"}
                       `}
                     >
-                      <span>{formatMessageTime(msg.timestamp)}</span>
+                      <span>{formatMessageTime(msg.createdAt)}</span>
 
                       {/* Read status for user messages */}
                       {isUser &&
-                        (msg.read ? (
+                        (msg.status === "read" ? (
                           <CheckCheck size={12} className="text-blue-100" />
+                        ) : msg.status === "delivered" ? (
+                          <CheckCheck size={12} className="text-blue-200" />
                         ) : (
-                          <Clock size={12} className="text-blue-100" />
+                          <Check size={12} className="text-blue-100" />
                         ))}
                     </div>
                   </div>

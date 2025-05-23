@@ -78,7 +78,7 @@ const UserListSidebar = ({ onSelectUser, selectedUser }) => {
                         className="w-10 h-10 rounded-full bg-gray-200"
                       />
                     ) : (
-                      <UserCircle size={40} className="text-gray-400" />
+                      <UserCircle size={50} className="text-gray-400" />
                     )}
 
                     {chat.isOnline && (
@@ -88,7 +88,7 @@ const UserListSidebar = ({ onSelectUser, selectedUser }) => {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
-                      <h3 className="text-sm font-semibold text-gray-900 truncate">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate">
                         {chat.customer?.name ||
                           chat.customer?.email ||
                           "Unknown User"}
