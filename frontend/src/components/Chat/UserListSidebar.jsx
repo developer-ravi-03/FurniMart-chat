@@ -18,9 +18,9 @@ const UserListSidebar = ({ onSelectUser, selectedUser }) => {
   }, [user]);
 
   return (
-    <div className="w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 h-full flex flex-col shadow-sm">
+    <div className="w-full bg-white border-r border-gray-200 h-full flex flex-col shadow-sm">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div className="p-3 sm:p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <Users size={20} className="text-blue-600" />
@@ -69,45 +69,48 @@ const UserListSidebar = ({ onSelectUser, selectedUser }) => {
                 }`}
                 onClick={() => onSelectUser(chat.customer?._id)}
               >
-                <div className="flex items-start p-4">
-                  <div className="flex-shrink-0 mr-3">
+                <div className="flex items-start p-3 sm:p-4">
+                  <div className="flex-shrink-0 mr-3 relative">
                     {chat.customer?.avatar ? (
                       <img
                         src={chat.customer.avatar}
                         alt={chat.customer?.name || "User"}
-                        className="w-10 h-10 rounded-full bg-gray-200"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200"
                       />
                     ) : (
-                      <UserCircle size={50} className="text-gray-400" />
+                      <UserCircle
+                        size={40}
+                        className="text-gray-400 sm:w-12 sm:h-12"
+                      />
                     )}
 
                     {chat.isOnline && (
-                      <span className="absolute top-5 left-11 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-baseline">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate pr-2">
                         {chat.customer?.name ||
                           chat.customer?.email ||
                           "Unknown User"}
                       </h3>
                       {chat.unreadCount > 0 && (
-                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">
-                          {chat.unreadCount}
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full flex-shrink-0">
+                          {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center text-xs text-gray-500 mt-1">
+                    <div className="flex items-center text-xs text-gray-500 mb-1">
                       <MessageSquare size={12} className="mr-1 flex-shrink-0" />
                       <p className="truncate">
                         {chat.lastMessage?.content || "No messages yet"}
                       </p>
                     </div>
 
-                    <div className="flex justify-between items-center mt-1">
+                    <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-400">
                         {chat.lastMessage?.timestamp
                           ? formatTimestamp(chat.lastMessage.timestamp)
@@ -115,7 +118,10 @@ const UserListSidebar = ({ onSelectUser, selectedUser }) => {
                       </span>
 
                       {selectedUser === chat.customer?._id && (
-                        <ChevronRight size={16} className="text-blue-600" />
+                        <ChevronRight
+                          size={16}
+                          className="text-blue-600 hidden sm:block"
+                        />
                       )}
                     </div>
                   </div>
@@ -127,8 +133,9 @@ const UserListSidebar = ({ onSelectUser, selectedUser }) => {
       </div>
 
       {/* Footer */}
-      <div className="p-3 bg-gray-50 border-t border-gray-200 text-xs text-center text-gray-500">
-        {activeChats.length} active conversations
+      <div className="p-2 sm:p-3 bg-gray-50 border-t border-gray-200 text-xs text-center text-gray-500">
+        {activeChats.length} active conversation
+        {activeChats.length !== 1 ? "s" : ""}
       </div>
     </div>
   );

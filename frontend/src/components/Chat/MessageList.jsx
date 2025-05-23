@@ -57,7 +57,7 @@ const MessageList = ({ messages, user }) => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 ">
+    <div className="flex-1 overflow-y-auto p-2 sm:p-4">
       {Object.keys(groupedMessages).length === 0 && (
         <div className="flex items-center justify-center h-full text-gray-400 text-sm">
           <p>No messages yet</p>
@@ -65,9 +65,9 @@ const MessageList = ({ messages, user }) => {
       )}
 
       {Object.keys(groupedMessages).map((dateKey) => (
-        <div key={dateKey} className="mb-6">
+        <div key={dateKey} className="mb-4 sm:mb-6">
           {/* Date divider */}
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center justify-center mb-3 sm:mb-4">
             <div className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
               {formatDateDivider(dateKey)}
             </div>
@@ -94,28 +94,27 @@ const MessageList = ({ messages, user }) => {
             return (
               <div
                 key={msg._id}
-                className={`mb-2 flex ${
+                className={`mb-1 sm:mb-2 flex ${
                   isUser ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md ${
-                    isConsecutive ? "mt-1" : "mt-3"
+                  className={`max-w-[85%] sm:max-w-xs lg:max-w-md ${
+                    isConsecutive ? "mt-1" : "mt-2 sm:mt-3"
                   }`}
                 >
                   {/* Message bubble */}
                   <div
                     className={`
-                      relative px-4 py-2 rounded-2xl shadow-sm
+                      relative px-3 sm:px-4 py-2 rounded-2xl shadow-sm text-sm sm:text-base
                       ${
                         isUser
                           ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-none"
                           : "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 rounded-bl-none border border-gray-300"
                       }
-                      ${isConsecutive ? "" : ""}
                     `}
                   >
-                    {msg.content}
+                    <div className="break-words">{msg.content}</div>
 
                     {/* Message timestamp */}
                     <div
@@ -129,18 +128,27 @@ const MessageList = ({ messages, user }) => {
                       {/* Read status for user messages */}
                       {isUser &&
                         (msg.status === "read" ? (
-                          <CheckCheck size={12} className="text-blue-100" />
+                          <CheckCheck
+                            size={12}
+                            className="text-blue-100 flex-shrink-0"
+                          />
                         ) : msg.status === "delivered" ? (
-                          <CheckCheck size={12} className="text-blue-200" />
+                          <CheckCheck
+                            size={12}
+                            className="text-blue-200 flex-shrink-0"
+                          />
                         ) : (
-                          <Check size={12} className="text-blue-100" />
+                          <Check
+                            size={12}
+                            className="text-blue-100 flex-shrink-0"
+                          />
                         ))}
                     </div>
                   </div>
 
                   {/* Sender name for non-user messages if not consecutive */}
                   {!isUser && !isConsecutive && msg.senderName && (
-                    <div className="text-xs text-gray-500 ml-2 mt-1">
+                    <div className="text-xs text-gray-500 ml-2 mt-1 truncate">
                       {msg.senderName}
                     </div>
                   )}
@@ -150,15 +158,6 @@ const MessageList = ({ messages, user }) => {
           })}
         </div>
       ))}
-
-      {/* For new messages notification (optional) */}
-      {messages.length > 10 && (
-        <div className="sticky bottom-4 flex justify-center">
-          <button className="bg-white text-blue-600 text-xs px-3 py-1 rounded-full shadow-md border border-gray-200 hover:bg-blue-50 transition-colors">
-            New messages
-          </button>
-        </div>
-      )}
 
       <div ref={messagesEndRef} />
     </div>

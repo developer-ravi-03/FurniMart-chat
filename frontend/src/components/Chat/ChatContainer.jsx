@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useChatContext } from "../../context/ChatContext";
 import MessageList from "./MessageList";
 import InputContainer from "./InputContainer";
@@ -12,10 +12,13 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-const ChatContainer = ({ selectedUser }) => {
+const ChatContainer = ({
+  selectedUser,
+  onBackToSidebar,
+  showMobileBackButton,
+}) => {
   const { messages, loadChatMessages, sendMessage, user, activeChats } =
     useChatContext();
-  const [showMobileHeader, setShowMobileHeader] = useState(false);
 
   // Find chat for selectedUser
   const chat = activeChats.find((c) => c.customer?._id === selectedUser);
@@ -27,17 +30,6 @@ const ChatContainer = ({ selectedUser }) => {
       loadChatMessages(chatId);
     }
   }, [chatId]);
-
-  // Handle responsive header toggle
-  useEffect(() => {
-    const handleResize = () => {
-      setShowMobileHeader(window.innerWidth < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   if (!chatId) {
     return (
@@ -64,8 +56,12 @@ const ChatContainer = ({ selectedUser }) => {
         {/* Main header */}
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-3">
-            {showMobileHeader && (
-              <button className="md:hidden p-1 rounded-full hover:bg-gray-100">
+            {/* Mobile back button */}
+            {showMobileBackButton && (
+              <button
+                className="md:hidden p-1 rounded-full hover:bg-gray-100 transition-colors"
+                onClick={onBackToSidebar}
+              >
                 <ArrowLeft size={20} className="text-gray-600" />
               </button>
             )}
@@ -88,14 +84,14 @@ const ChatContainer = ({ selectedUser }) => {
               )}
             </div>
 
-            <div>
-              <h2 className="font-bold text-gray-800 text-lg leading-tight">
+            <div className="min-w-0 flex-1">
+              <h2 className="font-bold text-gray-800 text-lg leading-tight truncate">
                 {customer?.name || customer?.email || "User"}
               </h2>
               <div className="flex items-center text-xs text-gray-500">
                 <div className="flex items-center">
-                  <Clock size={12} className="mr-1" />
-                  <span>
+                  <Clock size={12} className="mr-1 flex-shrink-0" />
+                  <span className="truncate">
                     {chat?.isOnline ? "Online now" : "Last seen 2h ago"}
                   </span>
                 </div>
@@ -103,11 +99,11 @@ const ChatContainer = ({ selectedUser }) => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hidden md:flex">
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hidden sm:flex">
               <Phone size={18} className="text-gray-600" />
             </button>
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hidden md:flex">
+            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hidden sm:flex">
               <Video size={18} className="text-gray-600" />
             </button>
             <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
